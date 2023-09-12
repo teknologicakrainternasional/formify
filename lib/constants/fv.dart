@@ -1,5 +1,6 @@
 class FV {
   FV._();
+
   static String required = "This @field is required";
   static String min = "This @field is should be at least @extra characters";
   static String same = "This @field is is not the same as @extra";
@@ -27,17 +28,14 @@ class FV {
   static String url = "This @field must be a valid url";
   static String regex = "This @field is not valid";
 
-  static String buildMessage(String message, String? attribute, [String? extra]) {
-    if (attribute != null) {
-      return message.replaceAll("@field", attribute.toLowerCase());
-    }
+  static String buildMessage(
+    String message,
+    String attribute, [
+    String? extra,
+  ]) {
+    message = message.replaceAll("@field", attribute);
     if (extra != null) {
-      return message.replaceAll("@extra", extra.toLowerCase());
-    }
-    if (attribute != null && extra != null) {
-      return message
-          .replaceAll("@field", attribute.toLowerCase())
-          .replaceAll("@extra", extra);
+      return message.replaceAll("@extra", extra);
     }
     return message;
   }

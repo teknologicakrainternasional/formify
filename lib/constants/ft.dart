@@ -7,4 +7,5 @@ class FT{
   static const String email = 'email';
   static const String multiline = 'multiline';
   static const String phone = 'phone';
+  static const String name = 'name';
 }

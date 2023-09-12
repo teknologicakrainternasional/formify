@@ -69,6 +69,13 @@ class FormifyTextField extends StatelessWidget {
     return textInputAction;
   }
 
+  TextCapitalization get tCapitalization {
+    if(keyboardType == TextInputType.name){
+      return TextCapitalization.words;
+    }
+    return textCapitalization;
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -77,7 +84,7 @@ class FormifyTextField extends StatelessWidget {
       key: key,
       focusNode: focusNode,
       keyboardType: keyboardType,
-      textCapitalization: textCapitalization,
+      textCapitalization: tCapitalization,
       textInputAction: tiAction,
       obscureText: obscureText,
       autocorrect: false,

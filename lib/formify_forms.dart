@@ -60,7 +60,6 @@ class FormifyForms {
     clearErrorMessages(attribute);
     _values[attribute] = value;
     validateAttribute(attribute, value);
-    print(getRule(attribute));
   }
 
   bool isValid(){
@@ -124,8 +123,8 @@ class FormifyForms {
     _errors.clear();
   }
 
-  Map<String, String> getErrors() {
-    final Map<String, String> errors = Map.from(_errors);
+  Map<String, List<String>> getErrors() {
+    final Map<String, List<String>> errors = Map.from(_errors);
     errors.removeWhere((key, value) => !attributes.containsKey(key));
     return errors;
   }
