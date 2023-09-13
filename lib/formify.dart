@@ -1,95 +1,40 @@
 library formify;
 
-class Formify{
-  Map<String, String> get attributes => {};
-  Map<String, String> get labels => {};
-  Map<String, List<String>> get validators => {};
-  Map<String, dynamic> get _values => {};
-  Map<String, List<String>> get _errors => {};
+import 'package:flutter/material.dart';
 
-  //ATTRIBUTE
-  //TODO: attribute's form type
+import 'formify.dart';
 
-  //VALIDATOR
-  //TODO: implement validator and add errors
+export 'package:formify/formify_forms.dart';
+export 'package:formify/widgets/formify_text_field.dart';
+export 'package:formify/constants/ft.dart';
+export 'package:formify/constants/fr.dart';
+export 'package:formify/constants/fv.dart';
+export 'package:formify/rules/_base_validator.dart';
 
-  //LABEL
-  String getLabel(String attribute){
-    String label = labels[attribute]??'';
-    if(label.isEmpty){
-      label = attribute;
-      label = label.replaceAll('_', ' ');
-      label = _capitalize(label);
-    }
+class Formify {
+  Formify(
+    this._forms,
+    this._attribute, [
+    bool isLoading = false,
+  ]) : _isLoading = isLoading;
 
-    return label;
-  }
+  final FormifyForms _forms;
+  final String _attribute;
+  final bool _isLoading;
 
-  //VALUE
-  setValue(String attribute, dynamic value){
-    if(!attributes.containsKey(attribute)){
-      return;
-    }
-    _values[attribute] = value;
-  }
+  String get attribute => _attribute;
 
-  dynamic getValue(String attribute){
-    return _values[attribute];
-  }
+  String get label => _forms.getLabel(_attribute);
 
-  //ERRORS
-  addErrorMessage(String attribute, String message){
-    if(!attributes.containsKey(attribute)){
-      return;
-    }
-    List<String> messages = getErrorMessages(attribute)??[];
-    messages.add(message);
-    setErrorMessages(attribute, messages);
-  }
+  dynamic get value => _forms.getValue(_attribute);
 
-  setErrorMessage(String attribute, String message){
-    if(!attributes.containsKey(attribute)){
-      return;
-    }
-    _errors[attribute] = [message];
-  }
+  List<String>? get errors => _forms.getErrorMessages(_attribute);
 
-  setErrorMessages(String attribute, List<String> messages){
-    if(!attributes.containsKey(attribute)){
-      return;
-    }
-    _errors[attribute] = messages;
-  }
+  String? get error => _forms.getErrorMessage(_attribute);
 
-  List<String>? getErrorMessages(String attribute){
-    return _errors[attribute];
-  }
+  GlobalKey<FormFieldState> get formKey => _forms.getFormKey(attribute);
 
-  String? getErrorMessage(String attribute){
-    List<String> errors = getErrorMessages(attribute)??[];
-    if(errors.isNotEmpty){
-      return errors[0];
-    }
-    return null;
-  }
+  bool get isLoading => _isLoading;
 
-  clearErrorMessages(String attribute){
-    _errors.remove(attribute);
-  }
-
-  clearAllErrorMessages(){
-    _errors.clear();
-  }
-
-  String _capitalize(String value) {
-    if (value.isEmpty) return value;
-    return value.split(' ').map(_capitalizeFirst).join(' ');
-  }
-
-  String? _capitalizeFirst(String s) {
-    if (s.isEmpty) return s;
-    return s[0].toUpperCase() + s.substring(1).toLowerCase();
-  }
-
-  //TODO: implement function to map
+  onChanged(dynamic value) => _forms.setValue(attribute, value);
 }
