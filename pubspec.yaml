@@ -1,7 +1,7 @@
 name: formify
-description: A new Flutter project.
-version: 0.0.1
-homepage:
+description: With Formify, you can quickly and easily create forms with customizable widget and strong validation.
+version: 1.0.0
+homepage: https://github.com/teknologicakrainternasional/formify#customize-form-widget-formbuilder
 
 environment:
   sdk: '>=2.15.0 <4.0.0'
