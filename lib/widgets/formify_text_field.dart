@@ -80,7 +80,9 @@ class FormifyTextField extends StatelessWidget {
 
   InputDecoration get iDecoration {
     if (inputDecoration != null) {
-      return inputDecoration!.copyWith(labelText: label);
+      return inputDecoration!.copyWith(
+        labelText: inputDecoration?.labelText ?? label,
+      );
     }
     return InputDecoration(labelText: label);
   }

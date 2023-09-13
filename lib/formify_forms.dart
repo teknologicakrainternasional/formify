@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:formify/extensions/string_extensions.dart';
 import 'package:formify/formify.dart';
-import 'package:formify/rules/_base_validator.dart';
 
 typedef FormifyFormBuilder = Widget Function(
   BuildContext context,
-  String attribute,
-  FormifyTextField textField,
-  bool isLoading,
-  dynamic value,
-  List<String>? errors,
+  Formify formify,
+  FormifyTextField child,
 );
 typedef FormifySeparatorBuilder = Widget Function(
   BuildContext context,
-  String attribute,
+  Formify formify,
   Widget child,
-  bool isLoading,
 );
 
 class FormifyForms {
   FormifyForms();
 
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier<bool>(false);
+
+  bool get isAutoValidation => false;
 
   Map<String, String> get attributes => {};
 
@@ -75,6 +72,34 @@ class FormifyForms {
     _validateAttributeByKey(attribute);
   }
 
+  String? _validateAttribute(String attribute, dynamic value, dynamic rule) {
+    if (rule is FormFieldValidator) {
+      return rule.call(value);
+    } else if (rule is String) {
+      final arrRule = rule.split(":");
+      final String actualRule = arrRule[0];
+      final String? extra = arrRule.length > 1 ? arrRule[1] : null;
+      final String label = getLabel(attribute);
+      final String? validatorMessage = getValidatorMessage(actualRule);
+      return actualRule
+          .getRuleValidator(
+            attribute: label,
+            value: value.toString(),
+            rule: actualRule,
+            extra: extra,
+            customMessage: validatorMessage,
+          )
+          ?.validate();
+    }
+
+    return null;
+  }
+
+  _validateAttributeByKey(String attribute) {
+    getFormKey(attribute).currentState?.validate() ?? true;
+    _getErrorNotifier(attribute).value = getErrorMessages(attribute);
+  }
+
   bool isFormValid() {
     for (final attribute in attributes.keys) {
       final value = getValue(attribute) ?? '';
@@ -103,7 +128,11 @@ class FormifyForms {
     clearErrorMessages(attribute);
     _values[attribute] = value;
     _getValueNotifier(attribute).value = value;
-    validateAttribute(attribute, value);
+    if(isAutoValidation){
+      validateAttribute(attribute, value);
+    }else{
+      clearErrorMessages(attribute);
+    }
   }
 
   dynamic getValue(String attribute) {
@@ -170,15 +199,10 @@ class FormifyForms {
     return errors;
   }
 
-  _validateAttributeByKey(String attribute) {
-    _getFormKey(attribute).currentState?.validate() ?? true;
-    _getErrorNotifier(attribute).value = getErrorMessages(attribute);
-  }
-
   //GENERATE WIDGETS
   List<Widget> getWidgets() {
     return attributes.keys.map((attribute) {
-      final key = _getFormKey(attribute);
+      final key = getFormKey(attribute);
       const separator = SizedBox(height: 16);
       final form = FormifyTextField(
         formKey: key,
@@ -206,11 +230,8 @@ class FormifyForms {
                             builder: (context, value, __) {
                               return formBuilder!(
                                 context,
-                                attribute,
+                                Formify(this, attribute, isLoading),
                                 form,
-                                isLoading,
-                                value,
-                                errors,
                               );
                             });
                       }),
@@ -218,7 +239,11 @@ class FormifyForms {
                   form.copyWith(readOnly: isLoading),
                 ],
                 if (separatorBuilder != null) ...[
-                  separatorBuilder!(context, attribute, separator, isLoading),
+                  separatorBuilder!(
+                    context,
+                    Formify(this, attribute, isLoading),
+                    separator,
+                  ),
                 ] else ...[
                   separator
                 ],
@@ -228,8 +253,8 @@ class FormifyForms {
     }).toList();
   }
 
-  //PRIVATE
-  GlobalKey<FormFieldState> _getFormKey(String attribute) {
+  //OTHER
+  GlobalKey<FormFieldState> getFormKey(String attribute) {
     late GlobalKey<FormFieldState> key;
     if (_formKeys[attribute] == null) {
       key = GlobalKey<FormFieldState>();
@@ -267,26 +292,5 @@ class FormifyForms {
   String _capitalizeFirst(String s) {
     if (s.isEmpty) return s;
     return s[0].toUpperCase() + s.substring(1).toLowerCase();
-  }
-
-  String? _validateAttribute(String attribute, dynamic value, dynamic rule) {
-    final arrRule = rule.split(":");
-    final String actualRule = arrRule[0];
-    final String? extra = arrRule.length > 1 ? arrRule[1] : null;
-    final String label = getLabel(attribute);
-    final String? validatorMessage = getValidatorMessage(actualRule);
-    late final BaseValidator? validator;
-    if (rule is BaseValidator) {
-      validator = rule;
-    } else if (rule is String) {
-      validator = actualRule.getRuleValidator(
-        attribute: label,
-        value: value.toString(),
-        rule: actualRule,
-        extra: extra,
-        customMessage: validatorMessage,
-      );
-    }
-    return validator?.validate();
   }
 }

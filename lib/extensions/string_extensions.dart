@@ -116,7 +116,7 @@ extension FormifyStringX on String {
       case "double":
         return Double(
             value: value, attribute: attribute, customMessage: customMessage);
-      case "interger":
+      case "integer":
         return Integer(
             value: value, attribute: attribute, customMessage: customMessage);
 
@@ -124,7 +124,7 @@ extension FormifyStringX on String {
         return Numeric(
             value: value, attribute: attribute, customMessage: customMessage);
       case "alpha_num":
-        return Integer(
+        return AlphaNumeric(
             value: value, attribute: attribute, customMessage: customMessage);
       case "lowercase":
         return LowerCase(
