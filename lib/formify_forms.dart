@@ -18,7 +18,7 @@ class FormifyForms {
 
   ValueNotifier<bool> isLoadingNotifier = ValueNotifier<bool>(false);
 
-  bool get isAutoValidation => false;
+  bool get isAutoValidation => true;
 
   Map<String, String> get attributes => {};
 
@@ -26,7 +26,7 @@ class FormifyForms {
 
   Map<String, List<dynamic>> get rules => {};
 
-  Map<String, String> get validatorMessages => {};
+  Map<String, String> get validationMessage => {};
 
   final Map<String, dynamic> _values = {};
 
@@ -44,6 +44,8 @@ class FormifyForms {
 
   InputDecoration? get inputDecoration => null;
 
+  Function(String)? get onSubmit => null;
+
   setIsLoading(bool value) {
     isLoadingNotifier.value = value;
   }
@@ -59,7 +61,7 @@ class FormifyForms {
   }
 
   String? getValidatorMessage(String rule) {
-    return validatorMessages[rule];
+    return validationMessage[rule];
   }
 
   validateAttribute(String attribute, dynamic value) {
@@ -121,6 +123,18 @@ class FormifyForms {
   }
 
   //VALUE
+  setInitialValue(String attribute, dynamic value) {
+    if (!attributes.containsKey(attribute)) {
+      return;
+    }
+    _values[attribute] = value;
+  }
+
+  setInitialValues(Map<String, dynamic> values) {
+    values.removeWhere((key, value) => !attributes.containsKey(key));
+    _values.addAll(values);
+  }
+
   setValue(String attribute, dynamic value) {
     if (!attributes.containsKey(attribute)) {
       return;
@@ -128,9 +142,9 @@ class FormifyForms {
     clearErrorMessages(attribute);
     _values[attribute] = value;
     _getValueNotifier(attribute).value = value;
-    if(isAutoValidation){
+    if (isAutoValidation) {
       validateAttribute(attribute, value);
-    }else{
+    } else {
       clearErrorMessages(attribute);
     }
   }
@@ -171,6 +185,7 @@ class FormifyForms {
       return;
     }
     _errors[attribute] = messages;
+    _validateAttributeByKey(attribute);
   }
 
   List<String>? getErrorMessages(String attribute) {
@@ -202,17 +217,25 @@ class FormifyForms {
   //GENERATE WIDGETS
   List<Widget> getWidgets() {
     return attributes.keys.map((attribute) {
+      final attrs = attributes.keys.toList();
+      final length = attrs.length;
+      final isLast = attrs.indexWhere((a) => a == attribute) == length - 1;
       final key = getFormKey(attribute);
+      final type = getAttributeType(attribute);
+      final obscure = type == FT.password;
       const separator = SizedBox(height: 16);
       final form = FormifyTextField(
         formKey: key,
+        obscureText: obscure,
         label: getLabel(attribute),
         validator: (_) => getErrorMessage(attribute),
         onChanged: (value) => setValue(attribute, value),
         keyboardType: getAttributeType(attribute).keyboardType,
         autovalidateMode: AutovalidateMode.always,
-        initialValue: getValue(attribute),
+        //initialValue: getValue(attribute),
         inputDecoration: inputDecoration,
+        onFieldSubmitted: isLast ? onSubmit : null,
+        textInputAction: isLast ? TextInputAction.send : TextInputAction.next,
       );
       return ValueListenableBuilder<bool>(
           valueListenable: isLoadingNotifier,
@@ -221,23 +244,29 @@ class FormifyForms {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                if (formBuilder != null) ...[
-                  ValueListenableBuilder<List<String>?>(
-                      valueListenable: _getErrorNotifier(attribute),
-                      builder: (context, errors, __) {
-                        return ValueListenableBuilder(
-                            valueListenable: _getValueNotifier(attribute),
-                            builder: (context, value, __) {
+                ValueListenableBuilder<List<String>?>(
+                    valueListenable: _getErrorNotifier(attribute),
+                    builder: (context, errors, __) {
+                      return ValueListenableBuilder(
+                          valueListenable: _getValueNotifier(attribute),
+                          builder: (context, value, __) {
+                            if (formBuilder != null) {
                               return formBuilder!(
                                 context,
                                 Formify(this, attribute, isLoading),
-                                form,
+                                form.copyWith(
+                                  readOnly: isLoading,
+                                  initialValue: value?.toString(),
+                                ),
                               );
-                            });
-                      }),
-                ] else ...[
-                  form.copyWith(readOnly: isLoading),
-                ],
+                            } else {
+                              return form.copyWith(
+                                readOnly: isLoading,
+                                initialValue: value?.toString(),
+                              );
+                            }
+                          });
+                    }),
                 if (separatorBuilder != null) ...[
                   separatorBuilder!(
                     context,
