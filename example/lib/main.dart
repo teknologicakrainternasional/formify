@@ -33,6 +33,15 @@ class _MyHomePageState extends State<MyHomePage> {
   final formDemo = FormDemo();
 
   @override
+  void initState() {
+    super.initState();
+    formDemo.setInitialValues({
+      'username': 'thisismyusername',
+      'password': 'password',
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -43,22 +52,14 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             ...formDemo.getWidgets(),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: FilledButton(
-                onPressed: () {
-                  /*formDemo.setIsLoading(true);
-                  Future.delayed(const Duration(seconds: 5)).then((_){
-                    formDemo.setIsLoading(false);
-                  });*/
-                  if(formDemo.isFormValid()){
-
-                  }
-                },
-                child: const Text('Submit'),
-              ),
-            )
+            FilledButton(
+              onPressed: () {
+                if (formDemo.isFormValid()) {
+                  //DO SOMETHING
+                }
+              },
+              child: const Text('Login'),
+            ),
           ],
         ),
       ),
