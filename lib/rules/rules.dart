@@ -17,7 +17,7 @@ export 'not_in.dart';
 export 'numeric.dart';
 export 'regex.dart';
 export 'required.dart';
-export '_base_rule.dart';
+export '_base_validator.dart';
 export 'same.dart';
 export 'starts_with.dart';
 export 'uppercase.dart';

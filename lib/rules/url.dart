@@ -1,7 +1,7 @@
 import 'package:formify/constants/fv.dart';
-import 'package:formify/rules/_base_rule.dart';
+import 'package:formify/rules/_base_validator.dart';
 
-class URL implements BaseRule {
+class URL implements BaseValidator {
   @override
   final String value;
   @override

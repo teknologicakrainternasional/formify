@@ -28,8 +28,10 @@ class FormifyTextField extends StatelessWidget {
     this.controller,
     this.required = false,
     this.inputDecoration,
+    this.formKey,
   }) : super(key: key);
 
+  final GlobalKey<FormFieldState>? formKey;
   final bool required;
   final String? label;
   final String? initialValue;
@@ -56,24 +58,31 @@ class FormifyTextField extends StatelessWidget {
   final InputDecoration? inputDecoration;
 
   int? get mxLine {
-    if(keyboardType == TextInputType.multiline){
+    if (keyboardType == TextInputType.multiline) {
       return null;
     }
     return maxLines;
   }
 
   TextInputAction? get tiAction {
-    if(keyboardType == TextInputType.multiline){
+    if (keyboardType == TextInputType.multiline) {
       return null;
     }
     return textInputAction;
   }
 
   TextCapitalization get tCapitalization {
-    if(keyboardType == TextInputType.name){
+    if (keyboardType == TextInputType.name) {
       return TextCapitalization.words;
     }
     return textCapitalization;
+  }
+
+  InputDecoration get iDecoration {
+    if (inputDecoration != null) {
+      return inputDecoration!.copyWith(labelText: label);
+    }
+    return InputDecoration(labelText: label);
   }
 
   @override
@@ -81,7 +90,7 @@ class FormifyTextField extends StatelessWidget {
     return TextFormField(
       initialValue: initialValue,
       controller: controller,
-      key: key,
+      key: formKey,
       focusNode: focusNode,
       keyboardType: keyboardType,
       textCapitalization: tCapitalization,
@@ -99,12 +108,13 @@ class FormifyTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       enabled: enabled,
       readOnly: readOnly,
-      decoration: inputDecoration ?? InputDecoration(labelText: label),
+      decoration: iDecoration,
       autovalidateMode: autovalidateMode,
     );
   }
 
   FormifyTextField copyWith({
+    GlobalKey<FormFieldState>? formKey,
     bool? required,
     String? label,
     String? initialValue,
@@ -131,6 +141,7 @@ class FormifyTextField extends StatelessWidget {
     InputDecoration? inputDecoration,
   }) {
     return FormifyTextField(
+      formKey: formKey ?? this.formKey,
       required: required ?? this.required,
       label: label ?? this.label,
       focusNode: focusNode ?? this.focusNode,

@@ -48,9 +48,13 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 48,
               child: FilledButton(
                 onPressed: () {
-                  //print(formDemo.getValues());
-                  formDemo.setErrorMessage('last_name', 'Namanya jelek');
-                  print(formDemo.getErrors().toString());
+                  /*formDemo.setIsLoading(true);
+                  Future.delayed(const Duration(seconds: 5)).then((_){
+                    formDemo.setIsLoading(false);
+                  });*/
+                  if(formDemo.isFormValid()){
+
+                  }
                 },
                 child: const Text('Submit'),
               ),

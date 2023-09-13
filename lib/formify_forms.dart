@@ -1,21 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:formify/extensions/string_extensions.dart';
 import 'package:formify/formify.dart';
+import 'package:formify/rules/_base_validator.dart';
+
+typedef FormifyFormBuilder = Widget Function(
+  BuildContext context,
+  String attribute,
+  FormifyTextField textField,
+  bool isLoading,
+  dynamic value,
+  List<String>? errors,
+);
+typedef FormifySeparatorBuilder = Widget Function(
+  BuildContext context,
+  String attribute,
+  Widget child,
+  bool isLoading,
+);
 
 class FormifyForms {
-  ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+  FormifyForms();
+
+  ValueNotifier<bool> isLoadingNotifier = ValueNotifier<bool>(false);
 
   Map<String, String> get attributes => {};
 
   Map<String, String> get labels => {};
 
-  Map<String, List<String>> get validators => {};
+  Map<String, List<dynamic>> get rules => {};
 
   Map<String, String> get validatorMessages => {};
 
-  final Map<String, String> _values = {};
+  final Map<String, dynamic> _values = {};
 
   final Map<String, List<String>> _errors = {};
+
+  final Map<String, GlobalKey<FormFieldState>> _formKeys = {};
+
+  final Map<String, ValueNotifier> _valueNotifiers = {};
+
+  final Map<String, ValueNotifier<List<String>?>> _errorNotifiers = {};
+
+  FormifyFormBuilder? get formBuilder => null;
+
+  FormifySeparatorBuilder? get separatorBuilder => null;
+
+  InputDecoration? get inputDecoration => null;
+
+  setIsLoading(bool value) {
+    isLoadingNotifier.value = value;
+  }
 
   //ATTRIBUTE
   String getAttributeType(String attribute) {
@@ -23,21 +57,30 @@ class FormifyForms {
   }
 
   //VALIDATOR
-  List<String> getRule(String attribute) {
-    return validators[attribute] ?? [];
+  List<dynamic> getRule(String attribute) {
+    return rules[attribute] ?? [];
   }
 
   String? getValidatorMessage(String rule) {
     return validatorMessages[rule];
   }
 
-  validateAttribute(String attribute, String value) {
+  validateAttribute(String attribute, dynamic value) {
     for (final rule in getRule(attribute)) {
       final errorMessage = _validateAttribute(attribute, value, rule);
       if (errorMessage != null) {
         addErrorMessage(attribute, errorMessage);
       }
     }
+    _validateAttributeByKey(attribute);
+  }
+
+  bool isFormValid() {
+    for (final attribute in attributes.keys) {
+      final value = getValue(attribute) ?? '';
+      validateAttribute(attribute, value);
+    }
+    return getErrors().isEmpty;
   }
 
   //LABEL
@@ -59,11 +102,8 @@ class FormifyForms {
     }
     clearErrorMessages(attribute);
     _values[attribute] = value;
+    _getValueNotifier(attribute).value = value;
     validateAttribute(attribute, value);
-  }
-
-  bool isValid(){
-    return getErrors().isEmpty;
   }
 
   dynamic getValue(String attribute) {
@@ -94,6 +134,7 @@ class FormifyForms {
       return;
     }
     _errors[attribute] = [message];
+    _validateAttributeByKey(attribute);
   }
 
   setErrorMessages(String attribute, List<String> messages) {
@@ -129,28 +170,95 @@ class FormifyForms {
     return errors;
   }
 
+  _validateAttributeByKey(String attribute) {
+    _getFormKey(attribute).currentState?.validate() ?? true;
+    _getErrorNotifier(attribute).value = getErrorMessages(attribute);
+  }
+
   //GENERATE WIDGETS
   List<Widget> getWidgets() {
     return attributes.keys.map((attribute) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          FormifyTextField(
-            label: getLabel(attribute),
-            initialValue: getValue(attribute),
-            validator: (_) => getErrorMessage(attribute),
-            onChanged: (value) => setValue(attribute, value),
-            keyboardType: getAttributeType(attribute).keyboardType,
-            autovalidateMode: AutovalidateMode.always,
-          ),
-          const SizedBox(height: 16)
-        ],
+      final key = _getFormKey(attribute);
+      const separator = SizedBox(height: 16);
+      final form = FormifyTextField(
+        formKey: key,
+        label: getLabel(attribute),
+        validator: (_) => getErrorMessage(attribute),
+        onChanged: (value) => setValue(attribute, value),
+        keyboardType: getAttributeType(attribute).keyboardType,
+        autovalidateMode: AutovalidateMode.always,
+        initialValue: getValue(attribute),
+        inputDecoration: inputDecoration,
       );
+      return ValueListenableBuilder<bool>(
+          valueListenable: isLoadingNotifier,
+          builder: (context, isLoading, __) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (formBuilder != null) ...[
+                  ValueListenableBuilder<List<String>?>(
+                      valueListenable: _getErrorNotifier(attribute),
+                      builder: (context, errors, __) {
+                        return ValueListenableBuilder(
+                            valueListenable: _getValueNotifier(attribute),
+                            builder: (context, value, __) {
+                              return formBuilder!(
+                                context,
+                                attribute,
+                                form,
+                                isLoading,
+                                value,
+                                errors,
+                              );
+                            });
+                      }),
+                ] else ...[
+                  form.copyWith(readOnly: isLoading),
+                ],
+                if (separatorBuilder != null) ...[
+                  separatorBuilder!(context, attribute, separator, isLoading),
+                ] else ...[
+                  separator
+                ],
+              ],
+            );
+          });
     }).toList();
   }
 
   //PRIVATE
+  GlobalKey<FormFieldState> _getFormKey(String attribute) {
+    late GlobalKey<FormFieldState> key;
+    if (_formKeys[attribute] == null) {
+      key = GlobalKey<FormFieldState>();
+      _formKeys[attribute] = key;
+    }
+    key = _formKeys[attribute]!;
+    return key;
+  }
+
+  ValueNotifier _getValueNotifier(String attribute) {
+    late ValueNotifier notifier;
+    if (_valueNotifiers[attribute] == null) {
+      notifier = ValueNotifier(getValue(attribute));
+      _valueNotifiers[attribute] = notifier;
+    }
+    notifier = _valueNotifiers[attribute]!;
+    return notifier;
+  }
+
+  ValueNotifier<List<String>?> _getErrorNotifier(String attribute) {
+    late ValueNotifier<List<String>?> notifier;
+    if (_errorNotifiers[attribute] == null) {
+      notifier = ValueNotifier(getErrorMessages(attribute));
+      _errorNotifiers[attribute] = notifier;
+    }
+    notifier = _errorNotifiers[attribute]!;
+    return notifier;
+  }
+
   String _capitalize(String value) {
     if (value.isEmpty) return value;
     return value.split(' ').map(_capitalizeFirst).join(' ');
@@ -161,23 +269,24 @@ class FormifyForms {
     return s[0].toUpperCase() + s.substring(1).toLowerCase();
   }
 
-  String? _validateAttribute(String attribute, String value, String rule) {
+  String? _validateAttribute(String attribute, dynamic value, dynamic rule) {
     final arrRule = rule.split(":");
     final String actualRule = arrRule[0];
     final String? extra = arrRule.length > 1 ? arrRule[1] : null;
     final String label = getLabel(attribute);
     final String? validatorMessage = getValidatorMessage(actualRule);
-    if (FR.allRules.contains(actualRule)) {
-      return actualRule
-          .getRuleValidator(
-            attribute: label,
-            value: value,
-            rule: actualRule,
-            extra: extra,
-            customMessage: validatorMessage,
-          )
-          .validate();
+    late final BaseValidator? validator;
+    if (rule is BaseValidator) {
+      validator = rule;
+    } else if (rule is String) {
+      validator = actualRule.getRuleValidator(
+        attribute: label,
+        value: value.toString(),
+        rule: actualRule,
+        extra: extra,
+        customMessage: validatorMessage,
+      );
     }
-    return null;
+    return validator?.validate();
   }
 }

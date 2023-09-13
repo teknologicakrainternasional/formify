@@ -21,7 +21,7 @@ extension FormifyStringX on String {
     return TextInputType.text;
   }
 
-  BaseRule getRuleValidator({
+  BaseValidator? getRuleValidator({
     required String attribute,
     required String value,
     required String rule,
@@ -140,8 +140,7 @@ extension FormifyStringX on String {
             customMessage: customMessage,
             extra: extra!);
       default:
-        return Required(
-            value: value, attribute: attribute, customMessage: customMessage);
+        return null;
     }
   }
 }
