@@ -20,7 +20,7 @@ class LessThan implements BaseValidator {
 
   @override
   String? validate() {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       return null;
     }
     final parsedValue = num.tryParse(value);

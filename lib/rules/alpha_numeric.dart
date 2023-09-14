@@ -18,7 +18,7 @@ class AlphaNumeric implements BaseValidator {
 
   @override
   String? validate() {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       return null;
     }
     RegExp exp = RegExp(r"^[a-zA-Z0-9]+$");

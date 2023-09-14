@@ -18,7 +18,7 @@ class Integer implements BaseValidator {
 
   @override
   String? validate() {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       return null;
     }
     final parsedValue = int.tryParse(value);

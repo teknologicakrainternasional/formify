@@ -98,7 +98,7 @@ class FormifyForms {
   }
 
   _validateAttributeByKey(String attribute) {
-    getFormKey(attribute).currentState?.validate() ?? true;
+    getFormKey(attribute).currentState?.validate();
     _getErrorNotifier(attribute).value = getErrorMessages(attribute);
   }
 

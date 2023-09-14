@@ -81,11 +81,10 @@ class FormifyTextField extends StatelessWidget {
   InputDecoration get iDecoration {
     if (inputDecoration != null) {
       return inputDecoration!.copyWith(
-        labelText: inputDecoration?.labelText ?? label,
-        prefixIcon: inputDecoration?.prefixIcon??prefixIcon,
-        suffixIcon: inputDecoration?.suffixIcon??suffixIcon,
-        hintText: inputDecoration?.hintText??hintText
-      );
+          labelText: inputDecoration?.labelText ?? label,
+          prefixIcon: inputDecoration?.prefixIcon ?? prefixIcon,
+          suffixIcon: inputDecoration?.suffixIcon ?? suffixIcon,
+          hintText: inputDecoration?.hintText ?? hintText);
     }
     return InputDecoration(labelText: label);
   }
@@ -146,7 +145,7 @@ class FormifyTextField extends StatelessWidget {
     InputDecoration? inputDecoration,
   }) {
     return FormifyTextField(
-      initialValue: initialValue??this.initialValue,
+      initialValue: initialValue ?? this.initialValue,
       formKey: formKey ?? this.formKey,
       required: required ?? this.required,
       label: label ?? this.label,

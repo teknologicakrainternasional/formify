@@ -1,4 +1,4 @@
-class FT{
+class FT {
   FT._();
 
   static const String text = 'text';

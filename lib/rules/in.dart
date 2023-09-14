@@ -20,7 +20,7 @@ class In implements BaseValidator {
 
   @override
   String? validate() {
-    if(value.isEmpty){
+    if (value.isEmpty) {
       return null;
     }
     final extraToList = extra.split(",");
