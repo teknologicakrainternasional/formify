@@ -24,8 +24,14 @@ typedef FormifySeparatorBuilder = Widget Function(
   Widget child,
 );
 
-class FormifyForms {
+/// A typedef for a function that can be used to modify a value before setting it in a Formify form field.
+///
+/// The [value] parameter represents the current value of the field, and this function should return
+/// the modified value that will be set in the form field. You can use this function to apply custom
+/// transformations or validations to the input value before it's saved in the form.
+typedef FormifyModifyValue = dynamic Function(dynamic value);
 
+class FormifyForms {
   final Map<String, dynamic> _values = {};
 
   final Map<String, List<String>> _errors = {};
@@ -90,8 +96,8 @@ class FormifyForms {
       inputDecoration: inputDecoration,
       onFieldSubmitted: isLast
           ? onSubmit != null
-          ? (value) => onSubmit!()
-          : null
+              ? (value) => onSubmit!()
+              : null
           : null,
       textInputAction: isLast ? TextInputAction.send : TextInputAction.next,
     );
@@ -207,6 +213,30 @@ class FormifyForms {
     return s[0].toUpperCase() + s.substring(1).toLowerCase();
   }
 
+  /// A function that is called before setting the value of an attribute.
+  ///
+  /// The [attribute] parameter specifies the name of the attribute, and the [value] parameter
+  /// contains the current value. This function should return the updated value, which can be
+  /// modified or processed as needed. If this function is not defined for an attribute,
+  /// the original value is used.
+  dynamic _onBeforeSetValue(String attribute, dynamic value) {
+    return beforeSetValue[attribute] != null
+        ? beforeSetValue[attribute]!(value)
+        : value;
+  }
+
+  /// A function that is called after setting the initial value of an attribute.
+  ///
+  /// The [attribute] parameter specifies the name of the attribute, and the [value] parameter
+  /// contains the initial value. This function should return the updated initial value, which can be
+  /// modified or processed as needed. If this function is not defined for an attribute,
+  /// the original initial value is used.
+  dynamic _onAfterSetInitialValue(String attribute, dynamic value) {
+    return afterSetInitialValue[attribute] != null
+        ? afterSetInitialValue[attribute]!(value)
+        : value;
+  }
+
   /// A [ValueNotifier] for tracking the loading state.
   ///
   /// This [ValueNotifier] is used to monitor loading state value.
@@ -231,6 +261,10 @@ class FormifyForms {
   /// If the returned value is `false`, validation will be done
   /// manually, and the user must activate it explicitly.
   bool get isAutoValidation => true;
+
+  Map<String, FormifyModifyValue?> get beforeSetValue => {};
+
+  Map<String, FormifyModifyValue?> get afterSetInitialValue => {};
 
   /// A getter that returns a list of [Attribute] objects.
   ///
@@ -423,9 +457,9 @@ class FormifyForms {
         errMsg.add(errorMessage);
       }
     }
-    if(errMsg.isNotEmpty){
+    if (errMsg.isNotEmpty) {
       setErrorMessages(attribute, errMsg);
-    }else{
+    } else {
       clearErrorMessages(attribute);
     }
   }
@@ -492,7 +526,8 @@ class FormifyForms {
     }
     _values[attribute] = value;
     _getValueNotifier(attribute).value = value;
-    getController(attribute).text = value?.toString() ?? '';
+    final modValue = _onAfterSetInitialValue(attribute, value);
+    getController(attribute).text = modValue?.toString() ?? '';
   }
 
   /// Set the initial values for multiple form attributes.
@@ -530,7 +565,9 @@ class FormifyForms {
     }
     clearErrorMessages(attribute);
     _values[attribute] = value;
-    _getValueNotifier(attribute).value = value;
+    getController(attribute).text = value?.toString() ?? '';
+    final modValue = _onBeforeSetValue(attribute, value);
+    _getValueNotifier(attribute).value = modValue;
     if (isAutoValidation) {
       validateAttribute(attribute, value);
     } else {
@@ -564,8 +601,8 @@ class FormifyForms {
   ///
   /// Returns:
   /// A map of form attribute identifiers to their corresponding current values.
-  Map<String, String> getValues() {
-    final Map<String, String> values = Map.from(_values);
+  Map<String, dynamic> getValues() {
+    final Map<String, dynamic> values = Map.from(_values);
     values.removeWhere((key, value) => !_attributes.containsKey(key));
     return values;
   }
@@ -811,10 +848,10 @@ class FormifyForms {
   /// will be removed from the list, effectively enabling plain text display.
   /// If the attribute is not in the list, it will be added to `_overrideObscureText`,
   /// causing the text input field to display its content in obscured form (e.g., for passwords).
-  toggleObscureText(String attribute){
-    if(_overrideObscureText.contains((attribute))){
+  toggleObscureText(String attribute) {
+    if (_overrideObscureText.contains((attribute))) {
       _overrideObscureText.remove(attribute);
-    }else{
+    } else {
       _overrideObscureText.add(attribute);
     }
     _getObscureNotifiers(attribute).value = isObscureText(attribute);
@@ -836,8 +873,8 @@ class FormifyForms {
   /// in plain text mode (not obscured). If the attribute is not in the list, it checks
   /// the `obscureText` property of the attribute's type to determine whether the text
   /// should be obscured based on its predefined behavior.
-  bool isObscureText(String attribute){
-    if(_overrideObscureText.contains((attribute))){
+  bool isObscureText(String attribute) {
+    if (_overrideObscureText.contains((attribute))) {
       return false;
     }
     return getAttributeType(attribute).obscureText;
