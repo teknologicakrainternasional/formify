@@ -36,8 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     formDemo.setInitialValues({
-      'username': 'thisismyusername',
-      'password': 'password',
+      'first_name': 'Agung',
+      'last_name': 'Budi',
     });
   }
 
@@ -52,13 +52,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             ...formDemo.getWidgets(),
-            FilledButton(
-              onPressed: () {
-                if (formDemo.isFormValid()) {
-                  //DO SOMETHING
-                }
-              },
-              child: const Text('Login'),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: FilledButton(
+                onPressed: () {
+                  if (formDemo.isFormValid()) {
+                    //DO SOMETHING
+                  }
+                },
+                child: const Text('Login'),
+              ),
             ),
           ],
         ),
