@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:formify/formify.dart';
 
 class FormDemo extends FormifyForms {
@@ -11,6 +12,7 @@ class FormDemo extends FormifyForms {
         ]),
         FormifyAttribute('address', FormifyType.multiline),
         FormifyAttribute('postal_code', FormifyType.numeric),
+        FormifyAttribute('password', FormifyType.password),
       ];
 
   @override
@@ -25,5 +27,28 @@ class FormDemo extends FormifyForms {
           FormifyRule.min(5),
           FormifyRule.max(5),
         ],
+        'password': [
+          FormifyRule.required,
+          FormifyRule.min(5),
+        ],
+      };
+
+  @override
+  FormifyFormBuilder? get formBuilder => (
+        context,
+        Formify formify,
+        FormifyTextField child,
+      ) {
+        if (formify.attribute == 'password') {
+          return child.copyWith(
+            suffixIcon: IconButton(
+              onPressed: formify.toggleObscureText,
+              icon: formify.obscureText
+                  ? const Icon(Icons.visibility)
+                  : const Icon(Icons.visibility_off),
+            ),
+          );
+        }
+        return child;
       };
 }

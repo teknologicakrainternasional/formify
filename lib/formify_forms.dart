@@ -38,6 +38,8 @@ class FormifyForms {
 
   final Map<String, ValueNotifier<List<String>?>> _errorNotifiers = {};
 
+  final Map<String, ValueNotifier<bool>> _obscureNotifiers = {};
+
   final List<String> _overrideObscureText = [];
 
   Map<String, FormifyType> get _attributes {
@@ -95,31 +97,36 @@ class FormifyForms {
     );
 
     return ValueListenableBuilder<bool>(
-        valueListenable: isLoadingNotifier,
+        valueListenable: _getObscureNotifiers(attribute),
         builder: (context, isLoading, __) {
-          return ValueListenableBuilder<List<String>?>(
-              valueListenable: _getErrorNotifier(attribute),
-              builder: (context, errors, __) {
-                return ValueListenableBuilder(
-                    valueListenable: _getValueNotifier(attribute),
-                    builder: (context, value, __) {
-                      if (formBuilder != null) {
-                        return formBuilder!(
-                          context,
-                          Formify(this, attribute, isLoading),
-                          form.copyWith(
-                            readOnly: isLoading,
-                            obscureText: isObscureText(attribute),
-                          ),
-                        );
-                      } else {
-                        return form.copyWith(
-                          readOnly: isLoading,
-                          obscureText: isObscureText(attribute),
-                          validator: (_) =>
-                              (errors ?? []).isNotEmpty ? errors![0] : null,
-                        );
-                      }
+          return ValueListenableBuilder<bool>(
+              valueListenable: isLoadingNotifier,
+              builder: (context, isLoading, __) {
+                return ValueListenableBuilder<List<String>?>(
+                    valueListenable: _getErrorNotifier(attribute),
+                    builder: (context, errors, __) {
+                      return ValueListenableBuilder(
+                          valueListenable: _getValueNotifier(attribute),
+                          builder: (context, value, __) {
+                            if (formBuilder != null) {
+                              return formBuilder!(
+                                context,
+                                Formify(this, attribute, isLoading),
+                                form.copyWith(
+                                  readOnly: isLoading,
+                                  obscureText: isObscureText(attribute),
+                                ),
+                              );
+                            } else {
+                              return form.copyWith(
+                                readOnly: isLoading,
+                                obscureText: isObscureText(attribute),
+                                validator: (_) => (errors ?? []).isNotEmpty
+                                    ? errors![0]
+                                    : null,
+                              );
+                            }
+                          });
                     });
               });
         });
@@ -174,6 +181,16 @@ class FormifyForms {
       _errorNotifiers[attribute] = notifier;
     }
     notifier = _errorNotifiers[attribute]!;
+    return notifier;
+  }
+
+  ValueNotifier<bool> _getObscureNotifiers(String attribute) {
+    late ValueNotifier<bool> notifier;
+    if (_obscureNotifiers[attribute] == null) {
+      notifier = ValueNotifier(isObscureText(attribute));
+      _obscureNotifiers[attribute] = notifier;
+    }
+    notifier = _obscureNotifiers[attribute]!;
     return notifier;
   }
 
@@ -787,7 +804,7 @@ class FormifyForms {
     }else{
       _overrideObscureText.add(attribute);
     }
-    _getValueNotifier(attribute).value = getValue(attribute);
+    _getObscureNotifiers(attribute).value = isObscureText(attribute);
   }
 
   /// Determines whether the text input associated with a specific attribute

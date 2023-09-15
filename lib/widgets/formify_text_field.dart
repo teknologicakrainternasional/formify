@@ -96,9 +96,17 @@ class FormifyTextField extends StatelessWidget {
             ],
           ),
         ),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        hintText: hintText,
       );
     }
-    return InputDecoration(labelText: label);
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: prefixIcon,
+      suffixIcon: suffixIcon,
+      hintText: hintText,
+    );
   }
 
   @override
