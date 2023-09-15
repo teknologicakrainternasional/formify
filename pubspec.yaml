@@ -1,6 +1,6 @@
 name: formify
-description: With Formify, you can quickly and easily create forms with customizable widget and strong validation.
-version: 1.0.0
+description: Formify is a versatile and customizable form handling library for Flutter, designed to simplify the process of creating and managing forms in your Flutter applications
+version: 1.1.0
 homepage: https://github.com/teknologicakrainternasional/formify#customize-form-widget-formbuilder
 
 environment:

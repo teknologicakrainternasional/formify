@@ -19,7 +19,7 @@ class FormDemo extends FormifyForms {
   Map<String, List<FormifyRule>> get rules => {
         'first_name': [FormifyRule.required],
         'last_name': [FormifyRule.required],
-        'phone_number': [FormifyRule.required],
+        'phone_number': [FormifyRule.required, MyPhoneValidation()],
         'email_address': [FormifyRule.email],
         'address': [FormifyRule.required],
         'postal_code': [
@@ -71,4 +71,15 @@ class FormDemo extends FormifyForms {
         }
         return child;
       };
+}
+
+class MyPhoneValidation extends FormifyRule{
+  @override
+  String? call(String attribute, String value) {
+    RegExp phoneNumberRegex = RegExp(r'^\+26\d{10,}$');
+    if (!phoneNumberRegex.hasMatch(value)) {
+      return '$attribute should start with +26 and minimum 12 digit';
+    }
+    return null;
+  }
 }

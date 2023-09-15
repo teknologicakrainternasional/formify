@@ -175,6 +175,30 @@ The following is a list of the available validation rules:
 | not_in      | `FormifyRule.notInItems(['you','me','they'])` | The field must not one in the list                                           |
 | regex       | `FormifyRule.regEx(r"^dog")`                  | The field must match regex expression                                        |
 
+You can also create custom validation rules by defining a class that extends `FormifyRule`
+and then adding it to your `rules` property. For example:
+
+```dart
+class MyPhoneValidation extends FormifyRule{
+  @override
+  String? call(String attribute, String value) {
+    RegExp phoneNumberRegex = RegExp(r'^\+26\d{10,}$');
+    if (!phoneNumberRegex.hasMatch(value)) {
+      return '$attribute should start with +26 and minimum 12 digit';
+    }
+    return null;
+  }
+}
+```
+
+```dart
+
+@override
+Map<String, List<FormifyRule>> get rules => {
+  'phone_number': [FormifyRule.required, MyPhoneValidation()],
+};
+```
+
 You can further customize validation messages by utilizing the `validationMessage` property,
 This property allows you to define custom messages for specific validation rules. 
 Simply include the validation rule followed by your desired message. 
@@ -192,7 +216,6 @@ Map<String, String> get validationMessage => {
   'starts_with': 'The :attribute must start with :pattern'
 };
 ```
-
 By default, Formify will automatically validate your input. 
 However, you can change this by adding the `isAutoValidation` property and setting it to `false`.
 
