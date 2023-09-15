@@ -36,8 +36,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     formDemo.setInitialValues({
-      'username': 'thisismyusername',
-      'password': 'password',
+      'first_name': 'Agung',
+      'last_name': 'Budi',
     });
   }
 

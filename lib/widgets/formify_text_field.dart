@@ -86,6 +86,18 @@ class FormifyTextField extends StatelessWidget {
           suffixIcon: inputDecoration?.suffixIcon ?? suffixIcon,
           hintText: inputDecoration?.hintText ?? hintText);
     }
+    if (required) {
+      return InputDecoration(
+        label: Text.rich(
+          TextSpan(
+            text: label,
+            children: const [
+              TextSpan(text: ' *', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
+      );
+    }
     return InputDecoration(labelText: label);
   }
 

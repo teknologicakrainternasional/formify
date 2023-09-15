@@ -6,10 +6,11 @@ import 'formify.dart';
 
 export 'package:formify/formify_forms.dart';
 export 'package:formify/widgets/formify_text_field.dart';
-export 'package:formify/constants/ft.dart';
-export 'package:formify/constants/fr.dart';
-export 'package:formify/constants/fv.dart';
-export 'package:formify/rules/_base_validator.dart';
+export 'package:formify/models/formify_attribute.dart';
+export 'package:formify/models/formify_row_attribute.dart';
+export 'package:formify/models/formify_rule.dart';
+export 'package:formify/models/_abstract.dart';
+export 'package:formify/models/formify_type.dart';
 
 class Formify {
   Formify(
