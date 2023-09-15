@@ -61,7 +61,7 @@ class FormifyForms {
     if (customMessage != null) {
       rule.message = customMessage;
     }
-    return rule(attribute, value.toString());
+    return rule(getLabel(attribute), value.toString());
   }
 
   Widget _formWidget(FormifyAttribute fAtt) {
@@ -115,6 +115,9 @@ class FormifyForms {
                                 form.copyWith(
                                   readOnly: isLoading,
                                   obscureText: isObscureText(attribute),
+                                  validator: (_) => (errors ?? []).isNotEmpty
+                                      ? errors![0]
+                                      : null,
                                 ),
                               );
                             } else {
@@ -413,11 +416,17 @@ class FormifyForms {
   /// - [attribute]: The identifier of the form attribute to be validated.
   /// - [value]: The value to be validated for the specified form attribute.
   validateAttribute(String attribute, dynamic value) {
+    final errMsg = <String>[];
     for (final rule in getRule(attribute)) {
       final errorMessage = _validateAttribute(attribute, value, rule);
       if (errorMessage != null) {
-        addErrorMessage(attribute, errorMessage);
+        errMsg.add(errorMessage);
       }
+    }
+    if(errMsg.isNotEmpty){
+      setErrorMessages(attribute, errMsg);
+    }else{
+      clearErrorMessages(attribute);
     }
   }
 
@@ -691,6 +700,8 @@ class FormifyForms {
   ///   error messages.
   clearErrorMessages(String attribute) {
     _errors.remove(attribute);
+    getFormKey(attribute).currentState?.validate();
+    _getErrorNotifier(attribute).value = getErrorMessages(attribute);
   }
 
   /// Clear all error messages associated with the form.
@@ -699,7 +710,9 @@ class FormifyForms {
   /// associated with the entire form. It clears the entire `_errors` map, effectively
   /// removing all error messages for all form attributes.
   clearAllErrorMessages() {
-    _errors.clear();
+    for (var attribute in _attributes.keys) {
+      clearErrorMessages(attribute);
+    }
   }
 
   /// Get error messages associated with form attributes.

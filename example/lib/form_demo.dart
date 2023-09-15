@@ -34,6 +34,21 @@ class FormDemo extends FormifyForms {
       };
 
   @override
+  InputDecoration? get inputDecoration => InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.purple),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
+      );
+
+  @override
   FormifyFormBuilder? get formBuilder => (
         context,
         Formify formify,
@@ -47,6 +62,11 @@ class FormDemo extends FormifyForms {
                   ? const Icon(Icons.visibility)
                   : const Icon(Icons.visibility_off),
             ),
+          );
+        }
+        if (formify.attribute == 'address') {
+          return child.copyWith(
+            minLines: 5,
           );
         }
         return child;

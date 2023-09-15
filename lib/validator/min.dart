@@ -43,7 +43,7 @@ class Min extends FormifyRule {
     if (value.isNotEmpty) {
       if (value.length < number) {
         return buildMessage(attribute, value, onExtra: (message) {
-          message.replaceAll(':number', number.toString());
+          message = message.replaceAll(':number', number.toString());
           return message;
         });
       }

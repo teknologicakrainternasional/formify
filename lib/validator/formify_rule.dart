@@ -1,3 +1,4 @@
+import 'package:formify/validator/_fv.dart';
 import 'package:formify/validator/validator.dart';
 
 /// An abstract class representing a validation rule for form field validation.
@@ -56,7 +57,7 @@ abstract class FormifyRule {
   final String ruleKey;
 
   /// The error message template for validation failures.
-  String message = ':attribute is not valid';
+  String message = FV.regex;
 
   /// Creates an instance of the `FormifyRule` class with a generated unique key.
   FormifyRule() : ruleKey = DateTime.now().toString();
@@ -93,12 +94,13 @@ abstract class FormifyRule {
     String input, {
     String Function(String)? onExtra,
   }) {
-    message = message.replaceAll(":attribute", attribute);
-    message = message.replaceAll(":input", input);
+    var msg = message;
+    msg = msg.replaceAll(":attribute", attribute);
+    msg = msg.replaceAll(":input", input);
     if (onExtra != null) {
-      message = onExtra(message);
+      msg = onExtra(msg);
     }
-    return message;
+    return msg;
   }
 
   /// Static factory method to create a required validation rule.

@@ -271,14 +271,21 @@ The form builder is a function that returns a `widget` and takes three parameter
 The `Formify` object allows you to get the following values:
 
 - `attribute`: The attribute key of the field
+- `type`: The `FormifyType` of the field
 - `label`: The label of the form
 - `value`: The value that has been entered
 - `errors`: The error values in a list of strings, if any
 - `error`: The error value in a string
-- `formKey`: The GlobalKey<FormFieldState> of the form that you are modifying
 - `isLoading`: A boolean value that indicates if the form is in a loading state. This is typically used to make the form readonly when it is loading.
+- `isRequired`: A boolean value that indicates if the form is required, when its rules contain FormifyRule.required.
+- `formKey`: The `GlobalKey<FormFieldState>` of the form that you are modifying
+- `controller`: The `TextEditingController` of the form that you are modifying
+- `keyboardType`: The `TextInputType` of the form that you are modifying
+- `textCapitalization`: The `TextCapitalization` of the form that you are modifying
+- `obscureText`: The `obscureText` of the form that you are modifying
 - `onChanged`: function that can update the value of your form.
-- etc.
+- `clearErrorMessages`: function that can clear error message of your form.
+- `toggleObscureText`: function that can toggle obscureText of your form.
 
 The `FormifyTextField` widget is a custom widget contain `TextFormField` widget. 
 Because of that you can change its properties by using the `copyWith()`.
