@@ -120,52 +120,76 @@ class FormifyTextField extends StatelessWidget {
 
   ///Key for linking the `FormifyTextField` with its parent form.
   final GlobalKey<FormFieldState>? formKey;
+
   ///Indicates whether the field is required (adds a red asterisk to the label).
   final bool required;
+
   ///The label text displayed above the input field.
   final String? label;
+
   ///The initial value of the input field.
   final String? initialValue;
+
   ///The focus node that controls the focus of the input field.
   final FocusNode? focusNode;
+
   ///The type of keyboard to display (e.g., text, number, email).
   final TextInputType? keyboardType;
+
   ///The text capitalization style for the input field.
   final TextCapitalization textCapitalization;
+
   ///The action to be associated with the input field (e.g., next, done).
   final TextInputAction? textInputAction;
+
   ///Whether the input text should be obscured (e.g., for passwords).
   final bool obscureText;
+
   ///The maximum number of lines for multiline input.
   final int? maxLines;
+
   ///The minimum number of lines for multiline input.
   final int? minLines;
+
   ///Callback function when the input value changes.
   final ValueChanged<String>? onChanged;
+
   ///Callback function when the input field is tapped.
   final GestureTapCallback? onTap;
+
   ///Callback function when the form field is submitted.
   final ValueChanged<String>? onFieldSubmitted;
+
   ///Callback function for saving the form field's value.
   final FormFieldSetter<String>? onSaved;
+
   ///Function to validate the input field's value.
   final FormFieldValidator<String>? validator;
+
   ///List of input formatters for custom input formatting.
   final List<TextInputFormatter>? inputFormatters;
+
   ///Whether the input field is enabled.
   final bool? enabled;
+
   ///Whether the input field is read-only.
   final bool readOnly;
+
   ///The mode for automatic validation.
   final AutovalidateMode? autovalidateMode;
+
   ///Hint text displayed when the input field is empty.
   final String? hintText;
+
   ///Widget to be displayed as a suffix icon in the input field.
   final Widget? suffixIcon;
+
   ///Widget to be displayed as a prefix icon in the input field.
   final Widget? prefixIcon;
+
   ///Controller for managing the input field's text.
   final TextEditingController? controller;
+
   ///Custom input decoration configuration.
   final InputDecoration? inputDecoration;
 

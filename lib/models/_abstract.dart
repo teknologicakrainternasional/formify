@@ -12,6 +12,7 @@
 /// - [attribute]: The unique identifier of the form attribute.
 abstract class Attribute {
   static const rowAttribute = '_row';
+
   /// The unique identifier of the form attribute.
   final String attribute;
 

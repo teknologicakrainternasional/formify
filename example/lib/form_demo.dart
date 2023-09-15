@@ -73,7 +73,7 @@ class FormDemo extends FormifyForms {
       };
 }
 
-class MyPhoneValidation extends FormifyRule{
+class MyPhoneValidation extends FormifyRule {
   @override
   String? call(String attribute, String value) {
     RegExp phoneNumberRegex = RegExp(r'^\+26\d{10,}$');

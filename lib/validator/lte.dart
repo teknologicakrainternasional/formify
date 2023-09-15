@@ -44,7 +44,7 @@ class LessThanOrEqual extends FormifyRule {
     if (value.isNotEmpty) {
       final parsedValue = num.tryParse(value);
       if (parsedValue == null || !(parsedValue <= number)) {
-        return buildMessage(attribute, value, onExtra: (message){
+        return buildMessage(attribute, value, onExtra: (message) {
           message.replaceAll(':number', number.toString());
           return message;
         });
