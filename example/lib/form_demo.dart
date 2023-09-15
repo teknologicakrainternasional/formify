@@ -20,6 +20,10 @@ class FormDemo extends FormifyForms {
         'phone_number': [FormifyRule.required],
         'email_address': [FormifyRule.email],
         'address': [FormifyRule.required],
-        'postal_code': [FormifyRule.required, FormifyRule.min(5), FormifyRule.max(5)],
+        'postal_code': [
+          FormifyRule.required,
+          FormifyRule.min(5),
+          FormifyRule.max(5),
+        ],
       };
 }

@@ -17,7 +17,7 @@ export 'not_in.dart';
 export 'numeric.dart';
 export 'regex.dart';
 export 'required.dart';
-export '_abstract.dart';
+export 'formify_rule.dart';
 export 'same.dart';
 export 'starts_with.dart';
 export 'uppercase.dart';
